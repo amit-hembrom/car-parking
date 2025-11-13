@@ -1,0 +1,176 @@
+package com.parking.firstUseCase;
+
+import com.parking.model.*;
+import com.parking.service.ParkingService;
+import com.parking.service.PricingService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
+
+import java.time.LocalDateTime;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+/**
+ * Test class with 6 tests for ParkingService
+ */
+class ParkingServiceTest1 {
+
+    private ParkingService parkingService;
+    private PricingService pricingService;
+
+    @BeforeEach
+    void setUp() {
+        pricingService = new PricingService();
+        parkingService = new ParkingService(pricingService);
+
+        // Add parking spots
+        parkingService.addParkingSpot(new ParkingSpot("A1"));
+        parkingService.addParkingSpot(new ParkingSpot("A2"));
+        parkingService.addParkingSpot(new ParkingSpot("A3"));
+    }
+
+    @Test
+    @DisplayName("1. Test successful vehicle parking")
+    void testParkVehicle() {
+        // Arrange
+        Vehicle car = new Vehicle("ABC123", VehicleType.CAR);
+
+        // Act
+        ParkingTicket ticket = parkingService.parkVehicle(car);
+
+        // Assert
+        assertNotNull(ticket);
+        assertNotNull(ticket.getTicketId());
+        assertEquals(car, ticket.getVehicle());
+        assertNotNull(ticket.getSpot());
+        assertTrue(ticket.getSpot().isOccupied());
+        assertEquals(car, ticket.getSpot().getParkedVehicle());
+        assertFalse(ticket.isProcessed());
+    }
+
+    @Test
+    @DisplayName("2. Test vehicle exit and fee calculation")
+    void testExitVehicle() {
+        // Arrange
+        Vehicle car = new Vehicle("XYZ789", VehicleType.CAR);
+        ParkingTicket ticket = parkingService.parkVehicle(car);
+        String ticketId = ticket.getTicketId();
+
+        // Act
+        double fee = parkingService.exitVehicle(ticketId);
+
+        // Assert
+        assertTrue(fee > 0);
+        assertEquals(5.0, fee, 0.01); // CAR_RATE is $5/hour, minimum 1 hour
+        assertTrue(ticket.isProcessed());
+        assertNotNull(ticket.getExitTime());
+        assertFalse(ticket.getSpot().isOccupied());
+    }
+
+    @Test
+    @DisplayName("3. Test parking lot full scenario")
+    void testParkingLotFull() {
+        // Arrange - Fill all spots
+        parkingService.parkVehicle(new Vehicle("CAR001", VehicleType.CAR));
+        parkingService.parkVehicle(new Vehicle("CAR002", VehicleType.CAR));
+        parkingService.parkVehicle(new Vehicle("CAR003", VehicleType.CAR));
+
+        // Act & Assert
+        Vehicle extraCar = new Vehicle("CAR004", VehicleType.CAR);
+        IllegalStateException exception = assertThrows(
+                IllegalStateException.class,
+                () -> parkingService.parkVehicle(extraCar)
+        );
+        assertEquals("No available parking spots", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("4. Test creating a reservation")
+    void testCreateReservation() {
+        // Arrange
+        String userId = "user123";
+        Vehicle car = new Vehicle("RES001", VehicleType.CAR);
+        LocalDateTime startTime = LocalDateTime.now().plusHours(2);
+        LocalDateTime endTime = startTime.plusHours(3);
+
+        // Act
+        Reservation reservation = parkingService.createReservation(
+                userId, car, startTime, endTime
+        );
+
+        // Assert
+        assertNotNull(reservation);
+        assertNotNull(reservation.getReservationId());
+        assertEquals(userId, reservation.getUserId());
+        assertEquals(car, reservation.getVehicle());
+        assertEquals(ReservationStatus.CONFIRMED, reservation.getStatus());
+        assertTrue(reservation.getPaidAmount() > 0);
+        // Reservation fee = CAR_RATE * 3 hours * 1.2 premium = 5 * 3 * 1.2 = 18.0
+        assertEquals(18.0, reservation.getPaidAmount(), 0.01);
+    }
+
+
+    @Test
+    @DisplayName("5. Test activating and completing a reservation")
+    void testReservationLifecycle() {
+        // Arrange - Create reservation that starts in a few seconds
+        String userId = "user456";
+        Vehicle car = new Vehicle("RES002", VehicleType.MOTORCYCLE);
+        LocalDateTime startTime = LocalDateTime.now().plusSeconds(3); // Start in 3 seconds
+        LocalDateTime endTime = startTime.plusHours(2);
+
+        Reservation reservation = parkingService.createReservation(
+                userId, car, startTime, endTime
+        );
+        String reservationId = reservation.getReservationId();
+
+        // Wait for the reservation time window to begin
+        try {
+            Thread.sleep(4000); // Wait 4 seconds
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        // Act - Activate
+        parkingService.activateReservation(reservationId);
+
+        // Assert - After activation
+        assertEquals(ReservationStatus.ACTIVE, reservation.getStatus());
+        assertNotNull(reservation.getAssignedSpot());
+        assertTrue(reservation.getAssignedSpot().isOccupied());
+
+        // Act - Complete
+        parkingService.completeReservation(reservationId);
+
+        // Assert - After completion
+        assertEquals(ReservationStatus.COMPLETED, reservation.getStatus());
+        assertFalse(reservation.getAssignedSpot().isOccupied());
+    }
+
+
+    @Test
+    @DisplayName("6. Test parking status reporting")
+    void testGetParkingStatus() {
+        // Arrange - Park 2 vehicles
+        parkingService.parkVehicle(new Vehicle("ST001", VehicleType.CAR));
+        parkingService.parkVehicle(new Vehicle("ST002", VehicleType.MOTORCYCLE));
+
+        // Create 1 reservation
+        Vehicle car = new Vehicle("ST003", VehicleType.CAR);
+        LocalDateTime startTime = LocalDateTime.now().plusHours(1);
+        LocalDateTime endTime = startTime.plusHours(2);
+        parkingService.createReservation("user789", car, startTime, endTime);
+
+        // Assert
+        // Cast to Map first
+        Map<String, Object> status = (Map<String, Object>) parkingService.getParkingStatus();
+
+        assertEquals(3L, status.get("totalSpots"));
+        assertEquals(2L, status.get("occupiedSpots"));
+        assertEquals(1L, status.get("availableSpots"));
+        assertEquals(2, status.get("activeTickets"));
+        assertEquals(1L, status.get("activeReservations"));
+    }
+}
