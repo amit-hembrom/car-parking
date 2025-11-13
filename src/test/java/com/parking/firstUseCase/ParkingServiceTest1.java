@@ -70,24 +70,7 @@ class ParkingServiceTest1 {
     }
 
     @Test
-    @DisplayName("3. Test parking lot full scenario")
-    void testParkingLotFull() {
-        // Arrange - Fill all spots
-        parkingService.parkVehicle(new Vehicle("CAR001", VehicleType.CAR));
-        parkingService.parkVehicle(new Vehicle("CAR002", VehicleType.CAR));
-        parkingService.parkVehicle(new Vehicle("CAR003", VehicleType.CAR));
-
-        // Act & Assert
-        Vehicle extraCar = new Vehicle("CAR004", VehicleType.CAR);
-        IllegalStateException exception = assertThrows(
-                IllegalStateException.class,
-                () -> parkingService.parkVehicle(extraCar)
-        );
-        assertEquals("No available parking spots", exception.getMessage());
-    }
-
-    @Test
-    @DisplayName("4. Test creating a reservation")
+    @DisplayName("3. Test creating a reservation")
     void testCreateReservation() {
         // Arrange
         String userId = "user123";
@@ -111,4 +94,28 @@ class ParkingServiceTest1 {
         assertEquals(18.0, reservation.getPaidAmount(), 0.01);
     }
 
+
+    @Test
+    @DisplayName("4. Test parking status reporting")
+    void testGetParkingStatus() {
+        // Arrange - Park 2 vehicles
+        parkingService.parkVehicle(new Vehicle("ST001", VehicleType.CAR));
+        parkingService.parkVehicle(new Vehicle("ST002", VehicleType.MOTORCYCLE));
+
+        // Create 1 reservation
+        Vehicle car = new Vehicle("ST003", VehicleType.CAR);
+        LocalDateTime startTime = LocalDateTime.now().plusHours(1);
+        LocalDateTime endTime = startTime.plusHours(2);
+        parkingService.createReservation("user789", car, startTime, endTime);
+
+        // Assert
+        // Cast to Map first
+        Map<String, Object> status = (Map<String, Object>) parkingService.getParkingStatus();
+
+        assertEquals(3L, status.get("totalSpots"));
+        assertEquals(2L, status.get("occupiedSpots"));
+        assertEquals(1L, status.get("availableSpots"));
+        assertEquals(2, status.get("activeTickets"));
+        assertEquals(1L, status.get("activeReservations"));
+    }
 }

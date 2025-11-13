@@ -72,9 +72,10 @@ Tests Included (4 complete tests)
 
 ✅ testExitVehicle - Vehicle exit and fee calculation
 
-✅ testParkingLotFull - Full parking lot scenario
+✅ testGetParkingStatus - Status reporting
 
 ✅ testCreateReservation - Reservation creation
+
 
 Note: These tests are already implemented and should pass once Test 2 is properly coded.
 
