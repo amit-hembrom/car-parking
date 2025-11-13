@@ -66,7 +66,7 @@ Overview
 These are pre-built foundational tests that validate basic parking system functionality. Candidates should understand how these work as they provide examples of the system's expected behavior.
 
 
-Tests Included (6 complete tests)
+Tests Included (4 complete tests)
 
 ✅ testParkVehicle - Basic vehicle parking
 
