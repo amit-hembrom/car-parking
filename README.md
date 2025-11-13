@@ -85,7 +85,7 @@ File: src/test/java/com/parking/secondUseCase/ParkingServiceTest2.java
 
 Overview
 
-Advanced staff-level tests that evaluate concurrent programming skills and thread safety implementation. These tests intentionally fail until candidates implement proper synchronization.
+Advanced tests that evaluate concurrent programming skills and thread safety implementation. These tests intentionally fail until candidates implement proper synchronization.
 
 What Candidates Must Implement in ParkingService
 🔧 Core Methods (Provide signatures only, remove implementations)
@@ -173,7 +173,8 @@ We're assessing:
 
 📌 Important Notes
 
-Test 2 failures are intentional and expected! The goal is to implement proper synchronization to make these challenging tests pass. This distinguishes senior/staff engineers from junior developers who may not have deep concurrency experience.
+Test 2 failures are intentional and expected! The goal is to implement proper synchronization to make these challenging tests pass.
+
 
 🎉 Good Luck!
 May your threads never deadlock! ⚡
