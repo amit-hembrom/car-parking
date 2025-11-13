@@ -8,7 +8,7 @@
 
 ## 🎯 Project Overview
 
-This is a **hands-on coding assessment** for evaluating **L3 (Senior Software Engineer)** and **L4 (Staff Engineer)** candidates on their ability to write effective unit and integration tests using **Mockito** and **JUnit 5**.
+This is a **hands-on coding assessment** for evaluating candidates on their ability to write effective unit and integration tests using **Mockito** and **JUnit 5**.
 
 ### What We're Testing
 
@@ -46,8 +46,8 @@ This parking management system includes:
 ### Installation
 ```bash
 # Clone the repository
-git clone https://github.com/YOUR_USERNAME/car-parking-system.git
-cd car-parking-system
+git clone https://github.com/amit-hembrom/car-parking.git
+cd car-parking
 
 # Build the project (this will fail tests initially - expected!)
 mvn clean install -DskipTests
@@ -75,11 +75,6 @@ Tests Included (6 complete tests)
 ✅ testParkingLotFull - Full parking lot scenario
 
 ✅ testCreateReservation - Reservation creation
-
-✅ testReservationLifecycle - Activation and completion
-
-✅ testGetParkingStatus - Status reporting
-
 
 Note: These tests are already implemented and should pass once Test 2 is properly coded.
 
@@ -113,7 +108,7 @@ private ParkingSpot findAndReserveAvailableSpot() {
 }
 ```
 
-📋 Missing Methods (Add these signatures)
+📋 Missing Methods (Add these signatures, verify first if they are needed)
 
 ```bash
 
