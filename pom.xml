@@ -11,7 +11,7 @@
     <packaging>jar</packaging>
 
     <name>Car Parking Management System</name>
-    <description>Interview project for L3/L4 Software Engineer candidates - Test implementation challenge</description>
+    <description>Interview project for Software Engineer candidates - Test implementation challenge</description>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
