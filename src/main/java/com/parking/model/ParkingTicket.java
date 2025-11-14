@@ -7,7 +7,7 @@ public class ParkingTicket {
     private final String ticketId;
     private final Vehicle vehicle;
     private final ParkingSpot spot;
-    private final LocalDateTime entryTime;
+    private final LocalDateTime entryTime; // LocalDateTime currentTime = LocalDateTime.now();
     private LocalDateTime exitTime;
     private boolean processed;
 

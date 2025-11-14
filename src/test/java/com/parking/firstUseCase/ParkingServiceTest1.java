@@ -36,7 +36,7 @@ class ParkingServiceTest1 {
     void testParkVehicle() {
         // Arrange
         Vehicle car = new Vehicle("ABC123", VehicleType.CAR);
-
+        // LocalDateTime currentTime = LocalDateTime.now();
         // Act
         ParkingTicket ticket = parkingService.parkVehicle(car);
 

@@ -45,6 +45,7 @@ public class ParkingService {
      */
     public ParkingTicket parkVehicle(Vehicle vehicle) {
         // TODO: Implement parking logic
+        // LocalDateTime currentTime = LocalDateTime.now();
         return null;
     }
 
